@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" group="system" method="upgrade" version="5.0">
+  <name>PLG_SYSTEM_MENUINTRO</name>
+  <author>Kontarinis Andreas — with help from ChatGPT</author>
+  <authorEmail>ankont@sch.gr</authorEmail>
+  <authorUrl>https://superor.wordpress.com/</authorUrl>
+  <creationDate>2025-08-27</creationDate>
+  <copyright>© 2025 Kontarinis Andreas — with help from ChatGPT</copyright>
+  <license>GNU General Public License version 2 or later</license>
+  <version>1.0.6</version>
+  <description>PLG_SYSTEM_MENUINTRO_DESC</description>
+  <element>menuintro</element>
+  <files>
+    <filename plugin="menuintro">menuintro.php</filename>
+    <folder>forms</folder>
+    <folder>language</folder>
+    <folder>src</folder>
+    <filename>README.md</filename>
+    <filename>LICENSE.txt</filename>
+  </files>
+  <languages>
+    <language tag="en-GB">language/en-GB/en-GB.plg_system_menuintro.ini</language>
+    <language tag="en-GB">language/en-GB/en-GB.plg_system_menuintro.sys.ini</language>
+    <language tag="el-GR">language/el-GR/el-GR.plg_system_menuintro.ini</language>
+    <language tag="el-GR">language/el-GR/el-GR.plg_system_menuintro.sys.ini</language>
+  </languages>
+  <config>
+    <fields name="params">
+      <fieldset name="basic" label="PLG_SYSTEM_MENUINTRO_FIELDSET_PLUGIN">
+        <field name="render_mode" type="list" default="auto" label="PLG_SYSTEM_MENUINTRO_RENDERMODE">
+          <option value="template">PLG_SYSTEM_MENUINTRO_RENDERMODE_TEMPLATE</option>
+          <option value="auto">PLG_SYSTEM_MENUINTRO_RENDERMODE_AUTO</option>
+        </field>
+      </fieldset>
+    </fields>
+  </config>
+</extension>
