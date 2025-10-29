@@ -20,17 +20,32 @@ class Renderer
         $headingTag     = (string) $p->get('menuintro_heading_tag', 'h1');
 
         // --- NEW: read toggles ---
-        $titleEnable = (int) $p->get('menuintro_title_enable', 0);
-        $textEnable  = (int) $p->get('menuintro_text_enable', 0);
+        $titleEnable   = (int) $p->get('menuintro_title_enable', 0);
+        $textEnable    = (int) $p->get('menuintro_text_enable', 0);
+        $usePageTitle  = (int) $p->get('menuintro_title_usepage', 0);
 
         $title = trim((string) $p->get('menuintro_title', ''));
+
+        // If requested, and a custom title is provided, sync it to the page title.
+        // When no custom title is provided, do nothing so the normal page title renders as usual.
+        if ($usePageTitle && $titleEnable && $title !== '') {
+            try {
+                $app = Factory::getApplication();
+                if ($app->isClient('site')) {
+                    $app->getDocument()->setTitle($title);
+                }
+            } catch (\Throwable $e) {
+                // Ignore title sync errors and continue rendering intro
+            }
+        }
 
         // 1) Prefer selected Article intro/full article render via core layout
         $articleId = (int) $p->get('menuintro_article', 0);
         if ($articleId) {
             $html = self::renderArticle($articleId);
             if ($html !== '') {
-                return self::wrap($html, $titleEnable ? $title : '', $headingTag, $containerClass);
+                $titleForWrap = ($title !== '' && $titleEnable) ? $title : '';
+                return self::wrap($html, $titleForWrap, $headingTag, $containerClass);
             }
         }
 
@@ -38,12 +53,14 @@ class Renderer
         $custom = (string) $p->get('menuintro_text', '');
         if ($textEnable) {
             if (trim($custom) !== '' || trim($title) !== '') {
-                return self::wrap($custom, $titleEnable ? $title : '', $headingTag, $containerClass);
+                $titleForWrap = ($title !== '' && $titleEnable) ? $title : '';
+                return self::wrap($custom, $titleForWrap, $headingTag, $containerClass);
             }
         } else {
             // Backward-compat: αν δεν υπάρχει toggle αλλά υπάρχει κείμενο
             if (!$p->exists('menuintro_text_enable') && trim($custom) !== '') {
-                return self::wrap($custom, $titleEnable ? $title : '', $headingTag, $containerClass);
+                $titleForWrap = ($title !== '' && $titleEnable) ? $title : '';
+                return self::wrap($custom, $titleForWrap, $headingTag, $containerClass);
             }
         }
 

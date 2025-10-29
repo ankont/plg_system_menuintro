@@ -7,7 +7,7 @@
   <creationDate>2025-08-27</creationDate>
   <copyright>© 2025 Kontarinis Andreas — with help from ChatGPT</copyright>
   <license>GNU General Public License version 2 or later</license>
-  <version>1.0.6</version>
+  <version>1.0.7</version>
   <description>PLG_SYSTEM_MENUINTRO_DESC</description>
   <element>menuintro</element>
   <files>

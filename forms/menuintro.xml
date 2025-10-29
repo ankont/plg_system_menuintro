@@ -13,6 +13,12 @@
         <option value="1">JYES</option>
       </field>
 
+      <!-- Use page title (εμφανίζεται μόνο αν Enable=Yes) -->
+      <field name="menuintro_title_usepage" type="radio" label="PLG_SYSTEM_MENUINTRO_TITLE_USEPAGE" description="PLG_SYSTEM_MENUINTRO_TITLE_USEPAGE_DESC" default="0" layout="joomla.form.field.radio.switcher" showon="menuintro_title_enable:1[AND]menuintro_enable:1">
+        <option value="0">JNO</option>
+        <option value="1">JYES</option>
+      </field>
+    
       <!-- Title (εμφανίζεται μόνο αν Enable=Yes) -->
       <field name="menuintro_title" type="text" label="PLG_SYSTEM_MENUINTRO_TITLE" description="PLG_SYSTEM_MENUINTRO_TITLE_DESC" showon="menuintro_title_enable:1[AND]menuintro_enable:1" />
 

@@ -62,13 +62,78 @@ class PlgSystemMenuintro extends CMSPlugin
         $menu = $app->getMenu()->getActive();
         if (!$menu) return;
 
-        $intro = \MenuIntro\Renderer::renderFromMenuParams($menu->getParams());
+        $params = $menu->getParams();
+        $usePageTitle = (int) $params->get('menuintro_title_usepage', 0);
+        $titleEnable  = (int) $params->get('menuintro_title_enable', 0);
+        $customTitle  = trim((string) $params->get('menuintro_title', ''));
+
+        $intro = \MenuIntro\Renderer::renderFromMenuParams($params);
         if ($intro === '') return;
 
-        $component = $doc->getBuffer('component');
+        $component = (string) $doc->getBuffer('component');
+
+        if ($usePageTitle && $titleEnable) {
+            // Ensure we don't end up with a duplicate heading: strip any intro-rendered heading placeholder
+            if ($customTitle !== '') {
+                $intro = preg_replace('/<h[1-6][^>]*class=\"[^\"]*menu-intro__title[^\"]*\"[^>]*>.*?<\\/h[1-6]>/is', '', $intro, 1);
+            }
+            $headingHtml = '';
+
+            if ($customTitle !== '') {
+                // Custom title override: render with selected heading tag and remove default heading from component
+                $headingTag = (string) $params->get('menuintro_heading_tag', 'h1');
+                $headingHtml = '<' . $headingTag . ' class="menu-intro__title">' . htmlspecialchars($customTitle, ENT_QUOTES, 'UTF-8') . '</' . $headingTag . '>';
+                $component = self::removeDefaultPageHeading($component);
+            } else {
+                // Move existing page heading (best-effort extraction)
+                [$extracted, $rest] = self::extractDefaultPageHeading($component);
+                if ($extracted !== '') {
+                    $headingHtml = $extracted;
+                    $component = $rest;
+                }
+            }
+
+            if ($headingHtml !== '') {
+                $doc->setBuffer($headingHtml . $intro . $component, 'component');
+                return;
+            }
+        }
+
+        // Fallback/default: intro before component
         if ($component !== null) {
             $doc->setBuffer($intro . $component, 'component');
         }
+    }
+
+    /**
+     * Extract default page heading wrapper/element from component HTML.
+     * @return array{0:string,1:string}
+     */
+    private static function extractDefaultPageHeading(string $componentHtml): array
+    {
+        $patterns = [
+            '/<div[^>]*class="[^"]*page-header[^"]*"[^>]*>.*?<\/div>/is',
+            '/<h[1-6][^>]*class="[^"]*page-title[^"]*"[^>]*>.*?<\/h[1-6]>/is',
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $componentHtml, $m)) {
+                $extracted = $m[0];
+                $remaining = preg_replace($pattern, '', $componentHtml, 1);
+                return [$extracted, (string) $remaining];
+            }
+        }
+
+        return ['', $componentHtml];
+    }
+
+    /**
+     * Remove default page heading (best-effort) from component HTML.
+     */
+    private static function removeDefaultPageHeading(string $componentHtml): string
+    {
+        [, $remaining] = self::extractDefaultPageHeading($componentHtml);
+        return $remaining;
     }
 
     /**
